@@ -16,13 +16,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.inventory.ItemStack;
-import org.ctp.enchantmentsolution.EnchantmentSolution;
 import org.ctp.enchantmentsolution.enchantments.CustomEnchantmentWrapper;
 import org.ctp.enchantmentsolution.enchantments.Enchantments;
 import org.ctp.enchantmentsolution.enchantments.helper.EnchantmentLevel;
 import org.ctp.enchantmentsolution.enchantments.helper.PlayerLevels;
 import org.ctp.enchantmentsolution.utils.ConfigUtils;
-import org.ctp.enchantmentsolution.utils.JobsUtils;
 
 public class EnchantmentListener implements Listener{
 
@@ -71,9 +69,6 @@ public class EnchantmentListener implements Listener{
 				player.setStatistic(Statistic.ITEM_ENCHANTED, player.getStatistic(Statistic.ITEM_ENCHANTED) + 1);
 				Advancement enchanted = Bukkit.getAdvancement(NamespacedKey.minecraft("story/enchant_item"));
 				player.getAdvancementProgress(enchanted).awardCriteria("enchanted_item");
-				if(EnchantmentSolution.getPlugin().isJobsEnabled()) {
-					JobsUtils.sendEnchantAction(player, item, item, enchantments);
-				}
 				break;
 			}
 		}

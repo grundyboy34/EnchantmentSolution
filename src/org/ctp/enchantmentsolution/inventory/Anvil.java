@@ -18,7 +18,6 @@ import org.ctp.enchantmentsolution.utils.AnvilUtils;
 import org.ctp.enchantmentsolution.utils.AnvilUtils.RepairType;
 import org.ctp.enchantmentsolution.utils.ChatUtils;
 import org.ctp.enchantmentsolution.utils.ConfigUtils;
-import org.ctp.enchantmentsolution.utils.JobsUtils;
 import org.ctp.enchantmentsolution.utils.items.ItemUtils;
 
 public class Anvil implements InventoryData{
@@ -226,9 +225,6 @@ public class Anvil implements InventoryData{
 			ItemUtils.giveItemToPlayer(player, combinedItem.getCombinedItem(), player.getLocation(), false);
 			if(combinedItem.getRepairType().equals(RepairType.REPAIR)) {
 				ItemUtils.giveItemToPlayer(player, combinedItem.getItemTwoLeftover(), player.getLocation(), false);
-			}
-			if(EnchantmentSolution.getPlugin().isJobsEnabled()) {
-				JobsUtils.sendAnvilAction(player, playerItems.get(1), combinedItem.getCombinedItem());
 			}
 			combinedItem = null;
 			playerItems.clear();

@@ -6,6 +6,7 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
+import org.ctp.enchantmentsolution.utils.ConfigUtils;
 import org.ctp.enchantmentsolution.utils.items.ItemUtils;
 
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -32,7 +33,11 @@ public class ChestPopulate_v1_14_R1 {
             	ItemStack newItem = null;
             	CraftItemStack cItem = CraftItemStack.asCraftMirror(item);
             	if((cItem.getType().equals(Material.ENCHANTED_BOOK))) {
-            		newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(new org.bukkit.inventory.ItemStack(Material.BOOK), loot));
+            		if (ConfigUtils.getEnchantedBook()) {
+            			newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(new org.bukkit.inventory.ItemStack(Material.ENCHANTED_BOOK), loot));
+            		} else {
+            			newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(new org.bukkit.inventory.ItemStack(Material.BOOK), loot));
+            		}
             	} else if (item.hasEnchantments()) {
             		newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(CraftItemStack.asBukkitCopy(item), loot));
             	}
@@ -62,7 +67,11 @@ public class ChestPopulate_v1_14_R1 {
 	            	ItemStack newItem = null;
 	            	CraftItemStack cItem = CraftItemStack.asCraftMirror(item);
 	            	if((cItem.getType().equals(Material.ENCHANTED_BOOK))) {
-	            		newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(new org.bukkit.inventory.ItemStack(Material.BOOK), loot));
+	            		if (ConfigUtils.getEnchantedBook()) {
+	            			newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(new org.bukkit.inventory.ItemStack(Material.ENCHANTED_BOOK), loot));
+	            		} else {
+	            			newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(new org.bukkit.inventory.ItemStack(Material.BOOK), loot));
+	            		}
 	            	} else if (item.hasEnchantments()) {
 	            		newItem = CraftItemStack.asNMSCopy(ItemUtils.addNMSEnchantment(CraftItemStack.asBukkitCopy(item), loot));
 	            	}

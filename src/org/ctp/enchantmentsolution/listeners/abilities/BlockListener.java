@@ -9,8 +9,14 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
-import org.bukkit.block.*;
-import org.bukkit.block.data.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Container;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Orientable;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -25,18 +31,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
-import org.ctp.enchantmentsolution.EnchantmentSolution;
 import org.ctp.enchantmentsolution.advancements.ESAdvancement;
 import org.ctp.enchantmentsolution.enchantments.DefaultEnchantments;
 import org.ctp.enchantmentsolution.enchantments.Enchantments;
 import org.ctp.enchantmentsolution.enchantments.helper.EnchantmentLevel;
 import org.ctp.enchantmentsolution.listeners.abilities.helpers.GoldDiggerCrop;
-import org.ctp.enchantmentsolution.listeners.abilities.support.VeinMinerListener;
-import org.ctp.enchantmentsolution.nms.McMMO;
 import org.ctp.enchantmentsolution.utils.AdvancementUtils;
 import org.ctp.enchantmentsolution.utils.LocationUtils;
-import org.ctp.enchantmentsolution.utils.items.*;
-import org.ctp.enchantmentsolution.utils.items.nms.*;
+import org.ctp.enchantmentsolution.utils.items.DamageUtils;
+import org.ctp.enchantmentsolution.utils.items.ItemSerialization;
+import org.ctp.enchantmentsolution.utils.items.ItemUtils;
+import org.ctp.enchantmentsolution.utils.items.nms.AbilityUtils;
+import org.ctp.enchantmentsolution.utils.items.nms.ItemBreakType;
+import org.ctp.enchantmentsolution.utils.items.nms.ItemPlaceType;
 
 @SuppressWarnings("unused")
 public class BlockListener extends EnchantmentListener{
@@ -133,7 +140,6 @@ public class BlockListener extends EnchantmentListener{
 						}
 						player.incrementStatistic(Statistic.MINE_BLOCK, event.getBlock().getType());
 						player.incrementStatistic(Statistic.USE_ITEM, item.getType());
-						McMMO.handleMcMMO(event, item);
 						super.damageItem(player, item);
 						event.getBlock().setType(Material.AIR);
 						Item droppedItem = player.getWorld().dropItem(
@@ -247,12 +253,6 @@ public class BlockListener extends EnchantmentListener{
 		if(!canRun(event, false, DefaultEnchantments.WIDTH_PLUS_PLUS, DefaultEnchantments.HEIGHT_PLUS_PLUS)) return;
 		if(AbilityUtils.getHeightWidthBlocks().contains(event.getBlock())) {
 			AbilityUtils.removeHeightWidthBlock(event.getBlock());
-			return;
-		}
-		if(McMMO.getIgnoredPlayers() != null && McMMO.getIgnoredPlayers().contains(player)) {
-			return;
-		}
-		if(EnchantmentSolution.getPlugin().getVeinMiner() != null && VeinMinerListener.hasVeinMiner(player)) {
 			return;
 		}
 		if(player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)) return;
@@ -573,7 +573,6 @@ public class BlockListener extends EnchantmentListener{
 		player.incrementStatistic(Statistic.MINE_BLOCK, event.getBlock().getType());
 		player.incrementStatistic(Statistic.USE_ITEM, item.getType());
 		super.damageItem(player, item);
-		McMMO.handleMcMMO(event, item);
 		event.getBlock().setType(Material.AIR);
 	}
 	

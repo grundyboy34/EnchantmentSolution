@@ -7,33 +7,50 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.ctp.enchantmentsolution.inventory.InventoryData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.ctp.enchantmentsolution.advancements.ESAdvancement;
 import org.ctp.enchantmentsolution.advancements.ESAdvancementProgress;
-import org.ctp.enchantmentsolution.commands.*;
+import org.ctp.enchantmentsolution.commands.ConfigEdit;
+import org.ctp.enchantmentsolution.commands.Debug;
+import org.ctp.enchantmentsolution.commands.Enchant;
+import org.ctp.enchantmentsolution.commands.EnchantInfo;
+import org.ctp.enchantmentsolution.commands.Reload;
+import org.ctp.enchantmentsolution.commands.RemoveEnchant;
+import org.ctp.enchantmentsolution.commands.Reset;
+import org.ctp.enchantmentsolution.commands.UnsafeEnchant;
 import org.ctp.enchantmentsolution.database.SQLite;
 import org.ctp.enchantmentsolution.enchantments.DefaultEnchantments;
-import org.ctp.enchantmentsolution.listeners.*;
-import org.ctp.enchantmentsolution.listeners.abilities.*;
+import org.ctp.enchantmentsolution.inventory.InventoryData;
+import org.ctp.enchantmentsolution.listeners.ChatMessage;
+import org.ctp.enchantmentsolution.listeners.InventoryClick;
+import org.ctp.enchantmentsolution.listeners.InventoryClose;
+import org.ctp.enchantmentsolution.listeners.PlayerChatTabComplete;
+import org.ctp.enchantmentsolution.listeners.PlayerInteract;
+import org.ctp.enchantmentsolution.listeners.VanishListener;
+import org.ctp.enchantmentsolution.listeners.VersionCheck;
+import org.ctp.enchantmentsolution.listeners.abilities.AbilityPlayerRunnable;
 import org.ctp.enchantmentsolution.listeners.abilities.BlockListener;
-import org.ctp.enchantmentsolution.listeners.abilities.support.VeinMinerListener;
+import org.ctp.enchantmentsolution.listeners.abilities.DamageListener;
+import org.ctp.enchantmentsolution.listeners.abilities.DeathListener;
+import org.ctp.enchantmentsolution.listeners.abilities.FishingListener;
+import org.ctp.enchantmentsolution.listeners.abilities.MiscListener;
+import org.ctp.enchantmentsolution.listeners.abilities.MiscRunnable;
+import org.ctp.enchantmentsolution.listeners.abilities.PlayerListener;
+import org.ctp.enchantmentsolution.listeners.abilities.ProjectileListener;
+import org.ctp.enchantmentsolution.listeners.abilities.WalkerListener;
 import org.ctp.enchantmentsolution.listeners.advancements.AdvancementEntityDeath;
 import org.ctp.enchantmentsolution.listeners.advancements.AdvancementPlayerEvent;
 import org.ctp.enchantmentsolution.listeners.advancements.AdvancementThread;
 import org.ctp.enchantmentsolution.listeners.chestloot.ChestLootListener;
-import org.ctp.enchantmentsolution.listeners.fishing.EnchantsFishingListener;
-import org.ctp.enchantmentsolution.listeners.fishing.McMMOFishingNMS;
 import org.ctp.enchantmentsolution.listeners.legacy.UpdateEnchantments;
 import org.ctp.enchantmentsolution.listeners.mobs.MobSpawning;
 import org.ctp.enchantmentsolution.listeners.mobs.Villagers;
 import org.ctp.enchantmentsolution.listeners.vanilla.AnvilListener;
 import org.ctp.enchantmentsolution.listeners.vanilla.EnchantmentListener;
 import org.ctp.enchantmentsolution.listeners.vanilla.GrindstoneListener;
-import org.ctp.enchantmentsolution.nms.McMMO;
 import org.ctp.enchantmentsolution.nms.animalmob.AnimalMob;
 import org.ctp.enchantmentsolution.utils.AdvancementUtils;
 import org.ctp.enchantmentsolution.utils.ChatUtils;
@@ -52,14 +69,10 @@ public class EnchantmentSolution extends JavaPlugin {
 	private static List<AnimalMob> ANIMALS = new ArrayList<AnimalMob>();
 	private boolean disable = false, initialization = true;
 	private SQLite db;
-	private String mcmmoType;
 	private BukkitVersion bukkitVersion;
 	private PluginVersion pluginVersion;
-	private Plugin jobsReborn;
 	private ConfigFiles files;
 	private VersionCheck check;
-	private String mcmmoVersion;
-	private Plugin veinMiner;
 
 	public void onEnable() {
 		PLUGIN = this;
@@ -113,65 +126,6 @@ public class EnchantmentSolution extends JavaPlugin {
 		registerEvent(new EnchantmentListener());
 		if(bukkitVersion.getVersionNumber() > 3) {
 			registerEvent(new GrindstoneListener());
-		}
-		
-		if(Bukkit.getPluginManager().isPluginEnabled("Jobs")) {
-			jobsReborn = Bukkit.getPluginManager().getPlugin("Jobs");
-			ChatUtils.sendInfo("Jobs Reborn compatibility enabled!");
-		}
-		
-		if(Bukkit.getPluginManager().isPluginEnabled("VeinMiner")) {
-			veinMiner = Bukkit.getPluginManager().getPlugin("VeinMiner");
-			ChatUtils.sendInfo("Vein Miner compatibility enabled!");
-			registerEvent(new VeinMinerListener());
-		}
-		
-		if(Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
-			mcmmoVersion = Bukkit.getPluginManager().getPlugin("mcMMO").getDescription().getVersion();
-			ChatUtils.sendToConsole(Level.INFO, "mcMMO Version: " + mcmmoVersion);
-			if(mcmmoVersion.substring(0, mcmmoVersion.indexOf(".")).equals("2")) {
-				ChatUtils.sendToConsole(Level.INFO, "Using the Overhaul Version!");
-				String[] mcVersion = mcmmoVersion.split("\\.");
-				boolean warning = false;
-				for(int i = 0; i < mcVersion.length; i++) {
-					try {
-						int num = Integer.parseInt(mcVersion[i]);
-						if(i == 0 && num > 2) {
-							warning = true;
-						} else if (i == 1 && num > 1) {
-							warning = true;
-						} else if (i == 2 && num > 99) {
-							warning = true;
-						}
-					} catch (NumberFormatException ex) {
-						warning = true;
-					}
-				}
-				if(warning) {
-					ChatUtils.sendToConsole(Level.WARNING, "McMMO Overhaul updates sporidically. Compatibility may break between versions.");
-					ChatUtils.sendToConsole(Level.WARNING, "If there are any compatibility issues, please notify the plugin author immediately.");
-					ChatUtils.sendToConsole(Level.WARNING, "Current Working Version: 2.1.99");
-				}
-				mcmmoType = "Overhaul";
-			} else {
-				ChatUtils.sendToConsole(Level.INFO, "Using the Classic Version! Compatibility should be intact.");
-				mcmmoType = "Classic";
-			}
-		} else {
-			mcmmoType = "Disabled";
-		}
-		
-		switch(mcmmoType) {
-		case "Overhaul":
-		case "Classic":
-			registerEvent(new McMMOFishingNMS());
-			break;
-		case "Disabled":
-			registerEvent(new EnchantsFishingListener());
-			break;
-		}
-		if(McMMO.getAbilities() != null) {
-			registerEvent(McMMO.getAbilities());
 		}
 
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(PLUGIN,
@@ -325,20 +279,12 @@ public class EnchantmentSolution extends JavaPlugin {
 		return db;
 	}
 
-	public String getMcMMOType() {
-		return mcmmoType;
-	}
-
 	public BukkitVersion getBukkitVersion() {
 		return bukkitVersion;
 	}
 
 	public PluginVersion getPluginVersion() {
 		return pluginVersion;
-	}
-
-	public boolean isJobsEnabled() {
-		return jobsReborn != null;
 	}
 
 	public ConfigFiles getConfigFiles() {
@@ -413,14 +359,6 @@ public class EnchantmentSolution extends JavaPlugin {
 		check.setLatestVersion(getRelease);
 		check.setExperimentalVersion(getExperimental);
 		check.run();
-	}
-
-	public String getMcMMOVersion() {
-		return mcmmoVersion;
-	}
-
-	public Plugin getVeinMiner() {
-		return veinMiner;
 	}
 
 }

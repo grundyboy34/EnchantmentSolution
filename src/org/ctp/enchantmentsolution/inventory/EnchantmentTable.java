@@ -24,7 +24,6 @@ import org.ctp.enchantmentsolution.enchantments.helper.EnchantmentLevel;
 import org.ctp.enchantmentsolution.enchantments.helper.PlayerLevels;
 import org.ctp.enchantmentsolution.utils.ChatUtils;
 import org.ctp.enchantmentsolution.utils.ConfigUtils;
-import org.ctp.enchantmentsolution.utils.JobsUtils;
 import org.ctp.enchantmentsolution.utils.StringUtils;
 import org.ctp.enchantmentsolution.utils.items.ItemSerialization;
 import org.ctp.enchantmentsolution.utils.items.ItemUtils;
@@ -359,9 +358,6 @@ public class EnchantmentTable implements InventoryData {
 		player.setStatistic(Statistic.ITEM_ENCHANTED, player.getStatistic(Statistic.ITEM_ENCHANTED) + 1);
 		Advancement enchanted = Bukkit.getAdvancement(NamespacedKey.minecraft("story/enchant_item"));
 		player.getAdvancementProgress(enchanted).awardCriteria("enchanted_item");
-		if(EnchantmentSolution.getPlugin().isJobsEnabled()) {
-			JobsUtils.sendEnchantAction(player, enchantItem, enchantableItem, enchLevels);
-		}
 	}
 
 	@Override

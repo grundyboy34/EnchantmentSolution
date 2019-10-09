@@ -574,9 +574,6 @@ public class ConfigFiles {
 		backup.set("version.bukkit", EnchantmentSolution.getPlugin().getBukkitVersion().getVersion());
 		backup.set("version.bukkit_num", EnchantmentSolution.getPlugin().getBukkitVersion().getVersionNumber());
 		backup.set("version.plugin", EnchantmentSolution.getPlugin().getPluginVersion().getCurrent());
-		backup.set("plugins.jobs_reborn", EnchantmentSolution.getPlugin().isJobsEnabled());
-		backup.set("plugins.mcmmo", EnchantmentSolution.getPlugin().getMcMMOType());
-		backup.set("plugins.mcmmo_version", EnchantmentSolution.getPlugin().getMcMMOVersion());
 		
 		for(PlayerLevels levels : PlayerLevels.PLAYER_LEVELS) {
 			List<List<EnchantmentLevel>> enchantmentLevels = levels.getEnchants();
